@@ -48,43 +48,44 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
           script: |
-            # Store the sudo password in a variable
-            SUDO_PASSWORD="${{ secrets.VPS_USER_PWD }}"
-            
-            # Navigate to project directory
+            echo "Navigating to project directory..."
             cd /home/edwardkemp/websites/test-app
 
-            # Pull latest changes
-            echo "$SUDO_PASSWORD" | sudo -S git pull origin main
+            echo "Pulling latest changes..."
+            sudo git pull origin main
 
-            # Ensure acme.json exists for Let's Encrypt
+            echo "Ensuring acme.json exists..."
             if [ ! -f ./acme.json ]; then
               echo "Creating acme.json file for Let's Encrypt."
-              echo "$SUDO_PASSWORD" | sudo -S touch ./acme.json
-              echo "$SUDO_PASSWORD" | sudo -S chmod 600 ./acme.json
+              sudo touch ./acme.json
+              sudo chmod 600 ./acme.json
             fi
 
-            # Stop and disable Nginx to avoid port conflicts
-            echo "$SUDO_PASSWORD" | sudo -S systemctl stop nginx || echo "Nginx not running."
-            echo "$SUDO_PASSWORD" | sudo -S systemctl disable nginx
+            echo "Stopping Nginx..."
+            sudo systemctl stop nginx || echo "Nginx not running."
 
-            # Remove Docker stack if it exists
-            echo "$SUDO_PASSWORD" | sudo -S docker stack rm test-app || echo "Stack test-app does not exist."
+            echo "Disabling Nginx..."
+            sudo systemctl disable nginx
 
-            # Wait until the stack is removed
+            echo "Removing Docker stack..."
+            sudo docker stack rm test-app || echo "Stack test-app does not exist."
+
+            echo "Waiting for stack removal..."
             while sudo docker stack ls | grep -q test-app; do
               echo "Waiting for stack test-app to be removed..."
               sleep 5
             done
 
-            # Remove all containers related to test-app
+            echo "Removing related containers..."
             sudo docker ps -a --filter "name=test-app" -q | xargs --no-run-if-empty sudo docker rm -f
 
-            # Remove all networks related to test-app
+            echo "Removing related networks..."
             sudo docker network ls | grep test-app_default | awk '{print $1}' | xargs --no-run-if-empty sudo docker network rm
 
-            # Prune unused Docker resources
+            echo "Pruning Docker system..."
             sudo docker system prune -f --volumes
 
-            # Deploy the updated stack
-            echo "$SUDO_PASSWORD" | sudo -S docker stack deploy -c docker-compose.prod.yml test-app
+            echo "Deploying the updated stack..."
+            sudo docker stack deploy -c docker-compose.prod.yml test-app
+
+            echo "Deployment completed."

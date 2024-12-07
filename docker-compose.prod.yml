@@ -6,6 +6,7 @@ networks:
 
 services:
   # Traefik service
+services:
   traefik:
     image: traefik:v2.10
     command:
@@ -14,12 +15,13 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       # Redirect HTTP to HTTPS
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
       # Let's Encrypt ACME configuration
       - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.le.acme.storage=/acme.json"
-      - "--certificatesresolvers.le.acme.tlsChallenge=true"  # Corrected flag
+      - "--certificatesresolvers.le.acme.tlsChallenge=true"
       - "--api.insecure=false"  # Disable the dashboard
     ports:
       - "80:80"
@@ -41,7 +43,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-      # No labels here; labels are defined at the service level
 
   # Frontend service
   frontend:
