@@ -48,27 +48,30 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
           script: |
+            # Store the sudo password in a variable
+            SUDO_PASSWORD="${{ secrets.VPS_USER_PWD }}"
+            
             echo "Navigating to project directory..."
             cd /home/edwardkemp/websites/test-app
 
             echo "Pulling latest changes..."
-            sudo git pull origin main
+            echo "$SUDO_PASSWORD" | sudo -S git pull origin main
 
             echo "Ensuring acme.json exists..."
             if [ ! -f ./acme.json ]; then
               echo "Creating acme.json file for Let's Encrypt."
-              sudo touch ./acme.json
-              sudo chmod 600 ./acme.json
+              echo "$SUDO_PASSWORD" | sudo -S touch ./acme.json
+              echo "$SUDO_PASSWORD" | sudo -S chmod 600 ./acme.json
             fi
 
             echo "Stopping Nginx..."
-            sudo systemctl stop nginx || echo "Nginx not running."
+            echo "$SUDO_PASSWORD" | sudo -S systemctl stop nginx || echo "Nginx not running."
 
             echo "Disabling Nginx..."
-            sudo systemctl disable nginx
+            echo "$SUDO_PASSWORD" | sudo -S systemctl disable nginx
 
             echo "Removing Docker stack..."
-            sudo docker stack rm test-app || echo "Stack test-app does not exist."
+            echo "$SUDO_PASSWORD" | sudo -S docker stack rm test-app || echo "Stack test-app does not exist."
 
             echo "Waiting for stack removal..."
             while sudo docker stack ls | grep -q test-app; do
@@ -86,6 +89,6 @@ jobs:
             sudo docker system prune -f --volumes
 
             echo "Deploying the updated stack..."
-            sudo docker stack deploy -c docker-compose.prod.yml test-app
+            echo "$SUDO_PASSWORD" | sudo -S docker stack deploy -c docker-compose.prod.yml test-app
 
             echo "Deployment completed."
