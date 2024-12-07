@@ -47,18 +47,14 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
           script: |
-            # Check if project directory exists, clone if it doesn't
-            if [ ! -d "/home/${{ secrets.VPS_USER }}/websites/test-app" ]; then
-              echo "Project directory does not exist. Cloning repository..."
-              git clone git@github.com:Steadyx/test-app.git /home/${{ secrets.VPS_USER }}/websites/test-app
-            else
-              echo "Project directory exists. Pulling latest changes..."
-              cd /home/${{ secrets.VPS_USER }}/websites/test-app
-              git pull origin main
-            fi
-
-            # Go to the project directory
+            # Navigate to the project directory
             cd /home/${{ secrets.VPS_USER }}/websites/test-app
+            
+            # Initialize acme.json if it doesn't exist
+            echo "Initializing acme.json..."
+            docker run --rm -v letsencrypt:/letsencrypt alpine sh -c "touch /letsencrypt/acme.json && chmod 600 /letsencrypt/acme.json"
+
+            # Check if docker-compose.prod.yml exists
             if [ ! -f docker-compose.prod.yml ]; then
               echo "docker-compose.prod.yml not found. Exiting."
               exit 1
@@ -79,3 +75,11 @@ jobs:
             # Deploy the new stack to Docker
             echo "Deploying the Docker stack..."
             docker stack deploy -c docker-compose.prod.yml test-app
+
+            # Optionally, verify that services are running
+            echo "Verifying service deployment..."
+            docker stack services test-app
+
+            # Optionally, inspect Traefik logs for any immediate errors
+            echo "Checking Traefik logs..."
+            docker service logs test-app_traefik --tail 100
