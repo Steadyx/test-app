@@ -7,7 +7,7 @@ services:
       # Enable the Traefik dashboard (can be disabled in production for security)
       - "--api=true"
       - "--api.dashboard=true"
-      
+
       # Docker provider setup
       - "--providers.docker=true"
 
@@ -20,32 +20,37 @@ services:
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80"  # Exposes port 80 for HTTP traffic
+      - "443:443"  # Exposes port 443 for HTTPS traffic
+
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock" # Allow Traefik to monitor Docker services
-      - "letsencrypt:/letsencrypt"                 # Persistent storage for certificates
+      - "/var/run/docker.sock:/var/run/docker.sock"  # Allow Traefik to monitor Docker services
+      - "letsencrypt:/letsencrypt"  # Persistent storage for certificates
+
     deploy:
       placement:
         constraints:
-          - "node.role == manager"                 # Ensure Traefik runs only on manager nodes
+          - "node.role == manager"  # Ensure Traefik runs only on manager nodes
 
   frontend:
     image: edwardkemp/frontend:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)" # Replace with your domain
-      - "traefik.http.routers.frontend.entrypoints=websecure"        # Force HTTPS
-      - "traefik.http.routers.frontend.tls.certresolver=myresolver"  # Use Let's Encrypt resolver
+      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"  # Route based on hostname
+      - "traefik.http.routers.frontend.entrypoints=websecure"  # Use the secure entrypoint
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"  # Specify the internal port if different than default
 
   backend:
     image: edwardkemp/backend:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`api.edward-codes.com`)" # Replace with your API domain
-      - "traefik.http.routers.backend.entrypoints=websecure"            # Force HTTPS
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"      # Use Let's Encrypt resolver
+      - "traefik.http.routers.backend.rule=Host(`api.edward-codes.com`)"  # Route based on hostname
+      - "traefik.http.routers.backend.entrypoints=websecure"  # Use the secure entrypoint
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
+      - "traefik.http.services.backend.loadbalancer.server.port=80"  # Specify the internal port if different than default
 
 volumes:
   letsencrypt:
