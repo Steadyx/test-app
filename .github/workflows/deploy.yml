@@ -35,81 +35,65 @@ jobs:
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.11  # Use a specific version for stability
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
+          key: ${{ secrets.SSH_KEY }}  # SSH private key
+          port: 22  # Specify SSH port if different
           script: |
-            # Store the sudo password in a variable
-            SUDO_PASSWORD="${{ secrets.VPS_USER_PWD }}"
-            sudoN() { echo "$SUDO_PASSWORD" | sudo -S "$@"; }
+            set -euo pipefail
+            IFS=$'\n\t'
+
+            # Variables
+            PROJECT_DIR="/home/${{ secrets.VPS_USER }}/websites/test-app"
+            REPO_URL="git@github.com:Steadyx/test-app.git"
+            BRANCH="main"
+
+            # Function to execute commands with sudo
+            sudo_exec() {
+              echo "${{ secrets.VPS_USER_PWD }}" | sudo -S "$@"
+            }
 
             echo "Navigating to project directory..."
-            cd /home/edwardkemp/websites/test-app
-
-            # Check if the project directory exists
-            if [ ! -d "/home/${{ secrets.VPS_USER }}/websites/test-app" ]; then
+            if [ ! -d "$PROJECT_DIR" ]; then
               echo "Project directory does not exist. Cloning repository..."
-              git clone git@github.com:Steadyx/test-app.git /home/${{ secrets.VPS_USER }}/websites/test-app
+              git clone "$REPO_URL" "$PROJECT_DIR"
             else
               echo "Project directory exists. Pulling latest changes..."
-              cd /home/${{ secrets.VPS_USER }}/websites/test-app
+              cd "$PROJECT_DIR"
 
-              # Reset any uncommitted changes to avoid conflicts
+              echo "Fetching latest changes..."
+              git fetch origin
+
               echo "Resetting local changes..."
-              git reset --hard
-
-              # Ensure the correct branch is checked out
-              echo "Checking out 'main' branch..."
-              git checkout main
-
-              # Pull the latest changes
-              echo "Pulling latest changes..."
-              git pull origin main
+              git reset --hard origin/"$BRANCH"
             fi
 
-            echo "Ensuring acme.json exists..."
-            if [ ! -f ./acme.json ]; then
+            echo "Ensuring acme.json exists with correct permissions..."
+            ACME_FILE="$PROJECT_DIR/acme.json"
+            if [ ! -f "$ACME_FILE" ]; then
               echo "Creating acme.json file for Let's Encrypt."
-              sudoN touch ./acme.json
-              sudoN chmod 600 ./acme.json
+              sudo_exec touch "$ACME_FILE"
             fi
+            sudo_exec chmod 600 "$ACME_FILE"
 
-            echo "Stopping Nginx..."
-            sudoN systemctl stop nginx || echo "Nginx not running."
+            echo "Pulling latest Docker images..."
+            sudo_exec docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
-            echo "Disabling Nginx..."
-            sudoN systemctl disable nginx
-
-            echo "Removing Docker stack..."
-            sudoN docker stack rm test-app || echo "Stack test-app does not exist."
+            echo "Stopping existing Docker stack..."
+            sudo_exec docker stack rm test-app || echo "Stack test-app does not exist."
 
             echo "Waiting for stack removal..."
-            while sudoN docker stack ls | grep -q test-app; do
+            while sudo_exec docker stack ls | grep -q test-app; do
               echo "Waiting for stack test-app to be removed..."
               sleep 5
             done
 
-            echo "Ensuring no remaining containers..."
-            ALL_CONTAINERS=$(sudoN docker ps -a -q)
-            if [ -n "$ALL_CONTAINERS" ]; then
-              echo "Removing all remaining containers..."
-              echo "$ALL_CONTAINERS" | xargs --no-run-if-empty sudoN docker rm -f
-            else
-              echo "No containers to remove."
-            fi
-
-            echo "Ensuring no orphaned volumes..."
-            sudoN docker volume prune -f
-
-            echo "Ensuring no related networks..."
-            sudoN docker network ls | grep test-app_default | awk '{print $1}' | xargs --no-run-if-empty sudoN docker network rm
-
-            echo "Pruning Docker system..."
-            sudoN docker system prune -f --volumes
+            echo "Pruning Docker system to remove unused data..."
+            sudo_exec docker system prune -f --volumes
 
             echo "Deploying the updated stack..."
-            sudoN docker stack deploy -c docker-compose.prod.yml test-app
+            sudo_exec docker stack deploy -c docker-compose.prod.yml test-app
 
-            echo "Deployment completed."
+            echo "Deployment completed successfully."
