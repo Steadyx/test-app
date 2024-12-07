@@ -45,8 +45,8 @@ services:
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
-      # Optional: Redirect HTTP to HTTPS
-      - "traefik.http.routers.frontend-http.rule=Host(`edward-codes.com`)"
+      # Redirect HTTP to HTTPS except for ACME challenges
+      - "traefik.http.routers.frontend-http.rule=Host(`edward-codes.com`) && PathPrefix(`!/well-known/acme-challenge`)"
       - "traefik.http.routers.frontend-http.entrypoints=web"
       - "traefik.http.routers.frontend-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
