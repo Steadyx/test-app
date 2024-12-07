@@ -64,13 +64,14 @@ jobs:
               chmod 600 /home/${{ secrets.VPS_USER }}/websites/test-app/acme.json
             fi
 
-            # Go to the project directory
-            cd /home/${{ secrets.VPS_USER }}/websites/test-app
-            if [ ! -f docker-compose.prod.yml ]; then
-              echo "docker-compose.prod.yml not found. Exiting."
-              exit 1
-            fi
+            # Stop Nginx to avoid port conflicts
+            sudo systemctl stop nginx || echo "Nginx not running."
+            sudo systemctl disable nginx
 
-            # Deploy the updated stack without removing it
-            echo "Deploying the Docker stack..."
+            # Remove exited containers and unused networks
+            docker ps -aq --filter "status=exited" | xargs --no-run-if-empty docker rm
+            docker network prune -f
+
+            # Deploy the updated stack
+            cd /home/${{ secrets.VPS_USER }}/websites/test-app
             docker stack deploy -c docker-compose.prod.yml test-app

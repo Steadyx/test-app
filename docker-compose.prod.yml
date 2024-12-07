@@ -1,9 +1,5 @@
-version: '3.8'
-
 networks:
   test-app_default:
-    driver: overlay
-  traefik:
     driver: overlay
 
 services:
@@ -12,7 +8,7 @@ services:
     image: traefik:v2.10
     command:
       - "--api=true"
-      - "--api.insecure=true"
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
@@ -21,15 +17,19 @@ services:
       - "--certificatesresolvers.le.acme.storage=/acme.json"
       - "--certificatesresolvers.le.acme.tlschallenge=true"
     ports:
-      - "80:80"    # HTTP traffic
-      - "443:443"  # HTTPS traffic
-      - "8080:8080" # Traefik dashboard (optional, for testing)
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Restricted Traefik dashboard
     volumes:
+      - "/path/to/acme.json:/acme.json"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./acme.json:/acme.json" # Stores SSL certificates
     networks:
-      - traefik
       - test-app_default
+    labels:
+      - "traefik.http.routers.traefik.rule=Host(`traefik.edward-codes.com`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=le"
     deploy:
       replicas: 1
       restart_policy:
@@ -40,13 +40,12 @@ services:
     image: edwardkemp/frontend:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
+      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`) && !PathPrefix(`/api`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
       - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=le" # Use Let's Encrypt
+      - "traefik.http.routers.frontend.tls.certresolver=le"
     networks:
       - test-app_default
-      - traefik
     deploy:
       replicas: 2
       restart_policy:
@@ -59,12 +58,12 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`edward-codes.com`) && PathPrefix(`/api`)"
       - "traefik.http.middlewares.backend-strip-prefix.stripprefix.prefixes=/api"
-      - "traefik.http.services.backend.loadbalancer.server.port=3000" # Backend service port
+      - "traefik.http.routers.backend.middlewares=backend-strip-prefix"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
       - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=le" # Use Let's Encrypt
+      - "traefik.http.routers.backend.tls.certresolver=le"
     networks:
       - test-app_default
-      - traefik
     deploy:
       replicas: 2
       restart_policy:
