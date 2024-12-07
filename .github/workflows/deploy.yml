@@ -57,6 +57,13 @@ jobs:
               git pull origin main
             fi
 
+            # Ensure acme.json exists for Let's Encrypt
+            if [ ! -f /home/${{ secrets.VPS_USER }}/websites/test-app/acme.json ]; then
+              echo "Creating acme.json file for Let's Encrypt."
+              touch /home/${{ secrets.VPS_USER }}/websites/test-app/acme.json
+              chmod 600 /home/${{ secrets.VPS_USER }}/websites/test-app/acme.json
+            fi
+
             # Go to the project directory
             cd /home/${{ secrets.VPS_USER }}/websites/test-app
             if [ ! -f docker-compose.prod.yml ]; then
@@ -64,18 +71,6 @@ jobs:
               exit 1
             fi
 
-            # Remove the existing stack to allow for a new deployment
-            echo "Removing existing Docker stack..."
-            docker stack rm test-app
-            sleep 10  # Wait for the removal to complete
-
-            # Remove network only if it exists
-            if docker network ls | grep -q "test-app_test-app_default"; then
-              echo "Network exists, removing it..."
-              docker network rm test-app_test-app_default || echo "Network already removed or doesn't exist."
-              sleep 5  # Wait for the removal of the network
-            fi
-
-            # Deploy the new stack to Docker
+            # Deploy the updated stack without removing it
             echo "Deploying the Docker stack..."
             docker stack deploy -c docker-compose.prod.yml test-app
