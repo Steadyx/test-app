@@ -41,6 +41,7 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           script: |
             # Check if the project directory exists
             if [ ! -d "/home/edwardkemp/websites/test-app" ]; then
