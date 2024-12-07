@@ -4,36 +4,48 @@ services:
   traefik:
     image: traefik:v2.10
     command:
-      - "--api.insecure=true" 
-      - "--providers.docker.swarmMode=true"
-      - "--providers.docker.exposedbydefault=false"
+      # Enable the Traefik dashboard (can be disabled in production for security)
+      - "--api=true"
+      - "--api.dashboard=true"
+      
+      # Docker provider setup
+      - "--providers.docker=true"
+
+      # Entrypoints (HTTP and HTTPS)
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+
+      # Configure automatic HTTPS with Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=edwardlanekemp@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
-      - "8080:8080" 
+      - "443:443"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "/var/run/docker.sock:/var/run/docker.sock" # Allow Traefik to monitor Docker services
+      - "letsencrypt:/letsencrypt"                 # Persistent storage for certificates
     deploy:
-      mode: global
       placement:
-        constraints: [node.role == manager] 
+        constraints:
+          - "node.role == manager"                 # Ensure Traefik runs only on manager nodes
 
   frontend:
-    image: edwardkemp/frontend:latest 
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
-        - "traefik.http.routers.frontend.entrypoints=web" 
-        - "traefik.http.services.frontend.loadbalancer.server.port=80" 
+    image: your-dockerhub-username/frontend:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)" # Replace with your domain
+      - "traefik.http.routers.frontend.entrypoints=websecure"        # Force HTTPS
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"  # Use Let's Encrypt resolver
 
   backend:
-    image: edwardkemp/backend:latest 
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.backend.rule=Host(`edward-codes.com`) && PathPrefix(`/api`)"
-        - "traefik.http.routers.backend.entrypoints=web"
-        - "traefik.http.services.backend.loadbalancer.server.port=3000" 
+    image: your-dockerhub-username/backend:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.edward-codes.com`)" # Replace with your API domain
+      - "traefik.http.routers.backend.entrypoints=websecure"            # Force HTTPS
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"      # Use Let's Encrypt resolver
+
+volumes:
+  letsencrypt:
