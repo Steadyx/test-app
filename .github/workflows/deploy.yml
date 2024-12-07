@@ -29,13 +29,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
-      - name: Build and push backend image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
-
       - name: Add Host Key to Known Hosts
         run: |
           mkdir -p ~/.ssh
