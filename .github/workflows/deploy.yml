@@ -35,7 +35,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@v0.1.10  # Updated to a valid version
+        uses: appleboy/ssh-action@v0.1.10  # Ensure using a valid version
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
@@ -49,11 +49,6 @@ jobs:
             PROJECT_DIR="/home/${{ secrets.VPS_USER }}/websites/test-app"
             REPO_URL="git@github.com:Steadyx/test-app.git"
             BRANCH="main"
-
-            # Function to execute commands with sudo
-            sudo_exec() {
-              echo "${{ secrets.VPS_USER_PWD }}" | sudo -S "$@"
-            }
 
             echo "Navigating to project directory..."
             if [ ! -d "$PROJECT_DIR" ]; then
@@ -74,26 +69,26 @@ jobs:
             ACME_FILE="$PROJECT_DIR/acme.json"
             if [ ! -f "$ACME_FILE" ]; then
               echo "Creating acme.json file for Let's Encrypt."
-              sudo_exec touch "$ACME_FILE"
+              sudo touch "$ACME_FILE"
             fi
-            sudo_exec chmod 600 "$ACME_FILE"
+            sudo chmod 600 "$ACME_FILE"
 
             echo "Pulling latest Docker images..."
-            sudo_exec docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
             echo "Stopping existing Docker stack..."
-            sudo_exec docker stack rm test-app || echo "Stack test-app does not exist."
+            sudo docker stack rm test-app || echo "Stack test-app does not exist."
 
             echo "Waiting for stack removal..."
-            while sudo_exec docker stack ls | grep -q test-app; do
+            while sudo docker stack ls | grep -q test-app; do
               echo "Waiting for stack test-app to be removed..."
               sleep 5
             done
 
             echo "Pruning Docker system to remove unused data..."
-            sudo_exec docker system prune -f --volumes
+            sudo docker system prune -f --volumes
 
             echo "Deploying the updated stack..."
-            sudo_exec docker stack deploy -c docker-compose.prod.yml test-app
+            sudo docker stack deploy -c docker-compose.prod.yml test-app
 
             echo "Deployment completed successfully."
