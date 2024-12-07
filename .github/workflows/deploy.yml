@@ -69,6 +69,6 @@ jobs:
             docker stack rm test-app
             sleep 10  # Wait for the removal to complete
 
-            # Deploy the stack to Docker
+            # Deploy the new stack to Docker
             echo "Deploying the Docker stack..."
             docker stack deploy -c docker-compose.prod.yml test-app
