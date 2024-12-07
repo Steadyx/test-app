@@ -49,7 +49,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
           script: |
             # Store the sudo password in a variable
-            # Store the sudo password in a variable
             SUDO_PASSWORD="${{ secrets.VPS_USER_PWD }}"
             sudoN() { echo "$SUDO_PASSWORD" | sudo -S "$@"; }
 
@@ -81,10 +80,19 @@ jobs:
               sleep 5
             done
 
-            echo "Removing related containers..."
-            sudoN docker ps -a --filter "name=test-app" -q | xargs --no-run-if-empty sudoN docker rm -f
+            echo "Ensuring no remaining containers..."
+            ALL_CONTAINERS=$(sudoN docker ps -a -q)
+            if [ -n "$ALL_CONTAINERS" ]; then
+              echo "Removing all remaining containers..."
+              echo "$ALL_CONTAINERS" | xargs --no-run-if-empty sudoN docker rm -f
+            else
+              echo "No containers to remove."
+            fi
 
-            echo "Removing related networks..."
+            echo "Ensuring no orphaned volumes..."
+            sudoN docker volume prune -f
+
+            echo "Ensuring no related networks..."
             sudoN docker network ls | grep test-app_default | awk '{print $1}' | xargs --no-run-if-empty sudoN docker network rm
 
             echo "Pruning Docker system..."
