@@ -40,11 +40,6 @@ services:
       # - "traefik.http.services.acme-challenge.loadbalancer.server.port=0"
       
       # Optional: Restrict access to Traefik dashboard (if needed)
-      - "traefik.http.routers.api-dashboard.rule=Host(`traefik.yourdomain.com`)"
-      - "traefik.http.routers.api-dashboard.service=api@internal"
-      - "traefik.http.routers.api-dashboard.entrypoints=web"
-      - "traefik.http.routers.api-dashboard.middlewares=auth"
-      
       # Example Middleware for Basic Auth (optional)
       # - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
       
