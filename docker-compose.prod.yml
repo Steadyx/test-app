@@ -47,14 +47,14 @@ services:
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
       - "traefik.http.services.frontend.loadbalancer.server.port=80"  # Specify the internal port if necessary
 
-  backend:
-    image: edwardkemp/backend:latest
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`api.edward-codes.com`)"  # Route based on hostname
-      - "traefik.http.routers.backend.entrypoints=websecure"  # Use the secure entrypoint
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
-      - "traefik.http.services.backend.loadbalancer.server.port=80"  # Specify the internal port if necessary
+    backend:
+     image: edwardkemp/backend:latest
+     labels:
+       - "traefik.enable=true"
+       - "traefik.http.routers.backend.rule=Host(`edward-codes.com`) && PathPrefix(`/api`)"  # Route based on hostname and path
+       - "traefik.http.routers.backend.entrypoints=websecure"   # Use the secure entrypoint
+       - "traefik.http.routers.backend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
+       - "traefik.http.services.backend.loadbalancer.server.port=80"  # Specify the internal port if necessary
 
 volumes:
   letsencrypt:
