@@ -35,15 +35,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
-      - name: Copy files to VPS
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "docker-compose.prod.yml"
-          target: "./websites/"
-
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
@@ -51,5 +42,16 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ./websites/
-            docker stack deploy -c docker-compose.prod.yml test-app
+            # Check if the project directory exists
+            if [ ! -d "/home/edwardkemp/websites/test-app" ]; then
+              echo "Project directory does not exist. Cloning repository..."
+              git clone git@github.com:Steadyx/test-app.git /home/edwardkemp/websites/
+            else
+              echo "Project directory exists. Pulling latest changes..."
+              cd /home/edwardkemp/websites/test-app
+              git pull origin main
+            fi
+
+            # Deploy the stack
+            cd /home/edwardkemp/websites/test-app
+            docker stack deploy -c docker-compose.prod.yml myapp
