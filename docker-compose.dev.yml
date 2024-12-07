@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"  # Map host port 3001 to container port 80 for local access
+    volumes:
+      - ./frontend:/app  # Mount your frontend code for live reloading (optional)
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Map host port 3000 to container port 3000
+    volumes:
+      - ./backend:/app  # Mount your backend code for live reloading (optional)
