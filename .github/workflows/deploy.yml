@@ -1,23 +1,23 @@
-- name: Deploy to VPS
-  uses: appleboy/ssh-action@v0.1.11  # Use a specific version
-  with:
-    host: ${{ secrets.VPS_IP }}
-    username: ${{ secrets.VPS_USER }}
-    key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
-    port: 22  # Change if your SSH runs on a different port
-    script: |
-      # Define environment variables used in deploy.sh
-      export VPS_USER=${{ secrets.VPS_USER }}
+name: Deploy to VPS
+uses: appleboy/ssh-action@v0.1.11  # Use a specific version
+with:
+  host: ${{ secrets.VPS_IP }}
+  username: ${{ secrets.VPS_USER }}
+  key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
+  port: 22  # Change if your SSH runs on a different port
+  script: |
+    # Define environment variables used in deploy.sh
+    export VPS_USER=${{ secrets.VPS_USER }}
 
-      # Navigate to the directory where deploy.sh is located
-      cd /home/${{ secrets.VPS_USER }}/websites/test-app || exit
+    # Navigate to the directory where deploy.sh is located
+    cd /home/${{ secrets.VPS_USER }}/websites/test-app || exit
 
-      # If deploy.sh doesn't exist on the VPS, copy it from the repository
-      if [ ! -f "./deploy/deploy.sh" ]; then
-        echo "deploy.sh not found. Copying from repository..."
-        cp "$PROJECT_DIR/deploy/deploy.sh" .
-        chmod +x deploy.sh
-      fi
+    # If deploy.sh doesn't exist on the VPS, copy it from the repository
+    if [ ! -f "./deploy/deploy.sh" ]; then
+      echo "deploy.sh not found. Copying from repository..."
+      cp "$PROJECT_DIR/deploy/deploy.sh" .
+      chmod +x deploy.sh
+    fi
 
-      # Execute the deployment script
-      ./deploy/deploy.sh
+    # Execute the deployment script
+    ./deploy/deploy.sh
