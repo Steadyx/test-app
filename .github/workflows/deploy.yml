@@ -42,5 +42,5 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd edward-codes-deploy
-            docker stack deploy -c docker-compose.prod.yml myapp
+            cd /websites/
+            docker stack deploy -c docker-compose.prod.yml test-app
