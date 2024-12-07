@@ -49,12 +49,9 @@ jobs:
           script: |
             # Navigate to the project directory
             cd /home/${{ secrets.VPS_USER }}/websites/test-app
-            
-            # Initialize acme.json if it doesn't exist
-            echo "Initializing acme.json..."
-            docker run --rm -v letsencrypt:/letsencrypt alpine sh -c "touch /letsencrypt/acme.json && chmod 600 /letsencrypt/acme.json"
 
-            # Check if docker-compose.prod.yml exists
+            # Optional: Initialize directories or files if needed
+            # Example: Ensure docker-compose.prod.yml exists
             if [ ! -f docker-compose.prod.yml ]; then
               echo "docker-compose.prod.yml not found. Exiting."
               exit 1
