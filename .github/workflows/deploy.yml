@@ -55,8 +55,26 @@ jobs:
             echo "Navigating to project directory..."
             cd /home/edwardkemp/websites/test-app
 
-            echo "Pulling latest changes..."
-            sudoN git pull origin main
+            # Check if the project directory exists
+            if [ ! -d "/home/${{ secrets.VPS_USER }}/websites/test-app" ]; then
+              echo "Project directory does not exist. Cloning repository..."
+              git clone git@github.com:Steadyx/test-app.git /home/${{ secrets.VPS_USER }}/websites/test-app
+            else
+              echo "Project directory exists. Pulling latest changes..."
+              cd /home/${{ secrets.VPS_USER }}/websites/test-app
+
+              # Reset any uncommitted changes to avoid conflicts
+              echo "Resetting local changes..."
+              git reset --hard
+
+              # Ensure the correct branch is checked out
+              echo "Checking out 'main' branch..."
+              git checkout main
+
+              # Pull the latest changes
+              echo "Pulling latest changes..."
+              git pull origin main
+            fi
 
             echo "Ensuring acme.json exists..."
             if [ ! -f ./acme.json ]; then
