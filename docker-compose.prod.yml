@@ -5,48 +5,10 @@ networks:
     driver: overlay
 
 services:
-  traefik:
-    image: traefik:v2.10
-    command:
-      - "--api=true"
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--log.level=DEBUG"  # Increased log level for troubleshooting
-      # Removed HTTPS and Let's Encrypt configurations
-    ports:
-      - "80:80"  # Only exposing HTTP
-      # Removed HTTPS port
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      # Removed Let's Encrypt volume since SSL is disabled
-    networks:
-      - test-app_default
-    deploy:
-      placement:
-        constraints:
-          - "node.role == manager"
-      replicas: 1  # Ensuring only one Traefik instance runs
-      update_config:
-        parallelism: 1
-        delay: 10s
-    labels:
-      # Removed ACME Challenge Router Labels since Let's Encrypt is disabled
-      # Optional: Traefik Dashboard Router (if needed)
-      # - "traefik.http.routers.api-dashboard.rule=Host(`traefik.edward-codes.com`)"
-      # - "traefik.http.routers.api-dashboard.service=api@internal"
-      # - "traefik.http.routers.api-dashboard.entrypoints=web"
-      # - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"  # If using auth
-
   frontend:
     image: edwardkemp/frontend:latest
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      # Removed HTTPS and certificate resolver labels
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
-      # Removed HTTP to HTTPS redirection labels
+    ports:
+      - "80:80"  # Map container port 80 to host port 80
     networks:
       - test-app_default
     deploy:
@@ -56,20 +18,9 @@ services:
 
   backend:
     image: edwardkemp/backend:latest
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`edward-codes.com`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=3000"
-      # Removed HTTPS and certificate resolver labels
     networks:
       - test-app_default
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
-
-# Removed the Let's Encrypt volume since SSL is disabled
-# volumes:
-#   letsencrypt:
-#     driver: local
