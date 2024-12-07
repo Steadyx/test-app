@@ -24,3 +24,5 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+    environment:
+      - NODE_ENV=production
