@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  test-app_default:  # Explicitly define the network
+    driver: overlay  # Use 'bridge' if not in Docker Swarm
+
 services:
   traefik:
     image: traefik:v2.10
@@ -41,7 +45,7 @@ services:
       - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"  # Route based on hostname
       - "traefik.http.routers.frontend.entrypoints=websecure"  # Use the secure entrypoint
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"  # Specify the internal port if different than default
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"  # Specify the internal port if necessary
 
   backend:
     image: edwardkemp/backend:latest
@@ -50,7 +54,7 @@ services:
       - "traefik.http.routers.backend.rule=Host(`api.edward-codes.com`)"  # Route based on hostname
       - "traefik.http.routers.backend.entrypoints=websecure"  # Use the secure entrypoint
       - "traefik.http.routers.backend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
-      - "traefik.http.services.backend.loadbalancer.server.port=80"  # Specify the internal port if different than default
+      - "traefik.http.services.backend.loadbalancer.server.port=80"  # Specify the internal port if necessary
 
 volumes:
   letsencrypt:
