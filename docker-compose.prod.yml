@@ -18,9 +18,13 @@ services:
       - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.le.acme.storage=/acme.json"
       - "--certificatesresolvers.le.acme.tlsChallenge=true"
+      # Optional: Enable Traefik Dashboard for Monitoring
+      - "--api.insecure=true"  # For testing purposes; consider securing in production
     ports:
       - "80:80"
       - "443:443"
+      # Optional: Expose Traefik Dashboard on a separate port (e.g., 8080)
+      # - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./acme.json:/acme.json"
@@ -35,10 +39,24 @@ services:
     image: edwardkemp/frontend:latest
     labels:
       - "traefik.enable=true"
+
+      # Router for Non-WWW Domain
       - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=le"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+      # Router for WWW Domain with Redirect Middleware
+      - "traefik.http.routers.frontend-www.rule=Host(`www.edward-codes.com`)"
+      - "traefik.http.routers.frontend-www.entrypoints=websecure"
+      - "traefik.http.routers.frontend-www.tls.certresolver=le"
+      - "traefik.http.routers.frontend-www.middlewares=redirect-www"
+
+      # Middleware to Redirect WWW to Non-WWW
+      - "traefik.http.middlewares.redirect-www.redirectregex.regex=^https?://www\\.(.*)"
+      - "traefik.http.middlewares.redirect-www.redirectregex.replacement=https://${1}"
+      - "traefik.http.middlewares.redirect-www.redirectregex.permanent=true"
+
     networks:
       - test-app_default
     deploy:
