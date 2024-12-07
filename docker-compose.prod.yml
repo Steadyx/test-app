@@ -3,23 +3,68 @@ version: '3.8'
 networks:
   test-app_default:
     driver: overlay
+  traefik:
+    driver: overlay
 
 services:
+  # Traefik service
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/acme.json"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+    ports:
+      - "80:80"    # HTTP traffic
+      - "443:443"  # HTTPS traffic
+      - "8080:8080" # Traefik dashboard (optional, for testing)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./acme.json:/acme.json" # Stores SSL certificates
+    networks:
+      - traefik
+      - test-app_default
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Frontend service
   frontend:
     image: edwardkemp/frontend:latest
-    ports:
-      - "80:80"  # Map container port 80 to host port 80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=le" # Use Let's Encrypt
     networks:
       - test-app_default
+      - traefik
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
 
+  # Backend service
   backend:
     image: edwardkemp/backend:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`edward-codes.com`) && PathPrefix(`/api`)"
+      - "traefik.http.middlewares.backend-strip-prefix.stripprefix.prefixes=/api"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000" # Backend service port
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=le" # Use Let's Encrypt
     networks:
       - test-app_default
+      - traefik
     deploy:
       replicas: 2
       restart_policy:
