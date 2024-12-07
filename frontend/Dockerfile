@@ -1,5 +1,3 @@
-# frontend/Dockerfile
-
 FROM nginx:alpine
 
 # Remove the default Nginx configuration
