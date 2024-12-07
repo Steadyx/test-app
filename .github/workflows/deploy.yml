@@ -45,8 +45,9 @@ jobs:
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_KEY }}  # This is the SSH key to access the VPS
+          key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
           script: |
+            # Check if project directory exists, clone if it doesn't
             if [ ! -d "/home/${{ secrets.VPS_USER }}/websites/test-app" ]; then
               echo "Project directory does not exist. Cloning repository..."
               git clone git@github.com:Steadyx/test-app.git /home/${{ secrets.VPS_USER }}/websites/test-app
@@ -56,9 +57,18 @@ jobs:
               git pull origin main
             fi
 
+            # Go to the project directory
             cd /home/${{ secrets.VPS_USER }}/websites/test-app
             if [ ! -f docker-compose.prod.yml ]; then
               echo "docker-compose.prod.yml not found. Exiting."
               exit 1
             fi
+
+            # Remove the existing stack to allow for a new deployment
+            echo "Removing existing Docker stack..."
+            docker stack rm test-app
+            sleep 10  # Wait for the removal to complete
+
+            # Deploy the stack to Docker
+            echo "Deploying the Docker stack..."
             docker stack deploy -c docker-compose.prod.yml test-app
