@@ -14,15 +14,10 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      # Redirect HTTP to HTTPS
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
-      # Let's Encrypt ACME configuration
-      - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
-      - "--certificatesresolvers.le.acme.storage=/acme.json"
-      - "--certificatesresolvers.le.acme.tlsChallenge=true"
-      - "--api.insecure=false"  # Disable the dashboard
+      - "--api.insecure=false"
     ports:
       - "80:80"
       - "443:443"
