@@ -1,3 +1,5 @@
+version: '3.8'
+
 networks:
   test-app_default:
     driver: overlay
@@ -11,22 +13,43 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      # Redirect HTTP to HTTPS
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+      # Let's Encrypt ACME configuration
       - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.le.acme.storage=/acme.json"
-      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.tlsChallenge=true"  # Corrected flag
       - "--api.insecure=false"  # Disable the dashboard
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./acme.json:/acme.json"
+      - "./acme.json:/acme.json"  # Ensure acme.json is present with correct permissions
     networks:
       - test-app_default
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
+      labels:
+        # Enable Traefik dashboard (optional, secure it if needed)
+        # - "traefik.http.routers.traefik.rule=Host(`traefik.edward-codes.com`)"
+        # - "traefik.http.routers.traefik.entrypoints=websecure"
+        # - "traefik.http.routers.traefik.tls.certresolver=le"
+        # - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+        # Uncomment and configure the above if you want to expose the Traefik dashboard securely
+    secrets:
+      # If you're using secrets for sensitive data, define them here
+      # Example:
+      # - source: traefik_acme
+      #   target: /path/in/container
+      # Ensure acme.json has correct permissions via deployment scripts
+      # This section can be omitted if not using Docker secrets
+      #traefik_acme:
+      #  file: ./acme.json
+    # Optionally, specify placement constraints or other deployment settings
 
   # Frontend service
   frontend:
@@ -63,3 +86,8 @@ services:
         condition: on-failure
     environment:
       - NODE_ENV=production
+
+# Optional: Define secrets if needed
+# secrets:
+#   traefik_acme:
+#     file: ./acme.json
