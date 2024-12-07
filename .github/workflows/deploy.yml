@@ -35,12 +35,12 @@ jobs:
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@v0.1.11  # Use a specific version for stability
+        uses: appleboy/ssh-action@v0.1.10  # Updated to a valid version
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_KEY }}  # SSH private key
-          port: 22  # Specify SSH port if different
+          key: ${{ secrets.SSH_KEY }}  # SSH private key without passphrase
+          port: 22  # Specify if different
           script: |
             set -euo pipefail
             IFS=$'\n\t'
