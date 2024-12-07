@@ -13,6 +13,7 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--log.level=DEBUG"  # Increased log level for troubleshooting
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=edwardlanekemp@gmail.com"
@@ -36,12 +37,14 @@ services:
       update_config:
         parallelism: 1
         delay: 10s
-      labels:
-        - "traefik.http.routers.traefik-acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-        - "traefik.http.routers.traefik-acme.entrypoints=web"
-        - "traefik.http.routers.traefik-acme.priority=1000"
-        - "traefik.http.routers.traefik-acme.service=acme-challenge"
-        - "traefik.http.services.acme-challenge.loadbalancer.server.port=0"
+
+    labels:
+      # Dedicated ACME Challenge Router
+      - "traefik.http.routers.traefik-acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+      - "traefik.http.routers.traefik-acme.entrypoints=web"
+      - "traefik.http.routers.traefik-acme.priority=1000"
+      - "traefik.http.routers.traefik-acme.service=acme-challenge"
+      - "traefik.http.services.acme-challenge.loadbalancer.server.port=0"
 
   frontend:
     image: edwardkemp/frontend:latest
