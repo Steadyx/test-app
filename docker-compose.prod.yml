@@ -54,7 +54,7 @@ services:
 
       # Middleware to Redirect WWW to Non-WWW
       - "traefik.http.middlewares.redirect-www.redirectregex.regex=^https?://www\\.(.*)"
-      - "traefik.http.middlewares.redirect-www.redirectregex.replacement=https://${1}"
+      - "traefik.http.middlewares.redirect-www.redirectregex.replacement=https://$${1}"
       - "traefik.http.middlewares.redirect-www.redirectregex.permanent=true"
 
     networks:
