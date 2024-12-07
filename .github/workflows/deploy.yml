@@ -46,7 +46,7 @@ jobs:
             IFS=$'\n\t'
 
             # Variables
-            PROJECT_DIR="/home/${{ secrets.VPS_USER }}/websites/test-app"
+            PROJECT_DIR="/home/edwardkemp/websites/test-app"
             REPO_URL="git@github.com:Steadyx/test-app.git"
             BRANCH="main"
 
@@ -89,6 +89,6 @@ jobs:
             sudo docker system prune -f --volumes
 
             echo "Deploying the updated stack..."
-            sudo docker stack deploy -c docker-compose.prod.yml test-app
+            sudo docker stack deploy -c /home/edwardkemp/websites/test-app/docker-compose.prod.yml test-app
 
             echo "Deployment completed successfully."
