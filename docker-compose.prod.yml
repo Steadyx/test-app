@@ -34,22 +34,14 @@ services:
       restart_policy:
         condition: on-failure
       labels:
-        # Enable Traefik dashboard (optional, secure it if needed)
-        # - "traefik.http.routers.traefik.rule=Host(`traefik.edward-codes.com`)"
-        # - "traefik.http.routers.traefik.entrypoints=websecure"
-        # - "traefik.http.routers.traefik.tls.certresolver=le"
-        # - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-        # Uncomment and configure the above if you want to expose the Traefik dashboard securely
-    secrets:
-      # If you're using secrets for sensitive data, define them here
-      # Example:
-      # - source: traefik_acme
-      #   target: /path/in/container
-      # Ensure acme.json has correct permissions via deployment scripts
-      # This section can be omitted if not using Docker secrets
-      #traefik_acme:
-      #  file: ./acme.json
-    # Optionally, specify placement constraints or other deployment settings
+        # Optional: Enable Traefik dashboard securely
+        # Uncomment and configure the following labels if you wish to expose the Traefik dashboard
+        #- "traefik.enable=true"
+        #- "traefik.http.routers.traefik.rule=Host(`traefik.edward-codes.com`)"
+        #- "traefik.http.routers.traefik.entrypoints=websecure"
+        #- "traefik.http.routers.traefik.tls.certresolver=le"
+        #- "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    # Secrets can be defined here if needed
 
   # Frontend service
   frontend:
@@ -86,8 +78,3 @@ services:
         condition: on-failure
     environment:
       - NODE_ENV=production
-
-# Optional: Define secrets if needed
-# secrets:
-#   traefik_acme:
-#     file: ./acme.json
