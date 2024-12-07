@@ -45,11 +45,11 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
+          username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_KEY }}  # SSH key to access the VPS
           script: |
             # Navigate to project directory
-            cd /home/${{ secrets.VPS_USER }}/websites/test-app
+            cd /home/edwardkemp/websites/test-app
 
             # Pull latest changes
             git pull origin main
@@ -65,8 +65,8 @@ jobs:
             sudo systemctl stop nginx || echo "Nginx not running."
             sudo systemctl disable nginx
 
-            # Remove existing stack
-            docker stack rm test-app
+            # Remove Docker stack if it exists
+            docker stack rm test-app || echo "Stack test-app does not exist."
 
             # Wait until the stack is removed
             while docker stack ls | grep -q test-app; do
@@ -74,11 +74,14 @@ jobs:
               sleep 5
             done
 
-            # Remove all exited containers related to test-app
-            docker ps -a --filter "name=test-app" --filter "status=exited" -q | xargs --no-run-if-empty docker rm
+            # Remove all containers related to test-app
+            docker ps -a --filter "name=test-app" -q | xargs --no-run-if-empty docker rm -f
 
-            # Prune unused networks
-            docker network prune -f
+            # Remove all networks related to test-app
+            docker network ls | grep test-app_default | awk '{print $1}' | xargs --no-run-if-empty docker network rm
+
+            # Prune unused Docker resources
+            docker system prune -f --volumes
 
             # Deploy the updated stack
             sudo docker stack deploy -c docker-compose.prod.yml test-app
