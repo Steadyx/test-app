@@ -35,24 +35,28 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
+      - name: Add Host Key to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
-          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           script: |
             # Check if the project directory exists
-            if [ ! -d "/home/edwardkemp/websites/test-app" ]; then
+            if [ ! -d "/./websites/test-app" ]; then
               echo "Project directory does not exist. Cloning repository..."
               git clone git@github.com:Steadyx/test-app.git /home/edwardkemp/websites/
             else
               echo "Project directory exists. Pulling latest changes..."
-              cd /home/edwardkemp/websites/test-app
+              cd ./websites/test-app
               git pull origin main
             fi
 
             # Deploy the stack
-            cd /home/edwardkemp/websites/test-app
-            docker stack deploy -c docker-compose.prod.yml myapp
+            cd ./websites/test-app
+            docker stack deploy -c docker-compose.prod.yml test-app
