@@ -1,60 +1,52 @@
 version: '3.8'
 
 networks:
-  test-app_default:  # Explicitly define the network
-    driver: overlay  # Use 'bridge' if not in Docker Swarm
+  test-app_default:  # Specify the network with the correct name
+    driver: overlay
 
 services:
   traefik:
     image: traefik:v2.10
     command:
-      # Enable the Traefik dashboard (can be disabled in production for security)
       - "--api=true"
       - "--api.dashboard=true"
-
-      # Docker provider setup
       - "--providers.docker=true"
-
-      # Entrypoints (HTTP and HTTPS)
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-
-      # Configure automatic HTTPS with Let's Encrypt
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
 
     ports:
-      - "80:80"  # Exposes port 80 for HTTP traffic
-      - "443:443"  # Exposes port 443 for HTTPS traffic
-
+      - "80:80"
+      - "443:443"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"  # Allow Traefik to monitor Docker services
-      - "letsencrypt:/letsencrypt"  # Persistent storage for certificates
-
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "letsencrypt:/letsencrypt"
+      
     deploy:
       placement:
         constraints:
-          - "node.role == manager"  # Ensure Traefik runs only on manager nodes
+          - "node.role == manager"
 
   frontend:
     image: edwardkemp/frontend:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"  # Route based on hostname
-      - "traefik.http.routers.frontend.entrypoints=websecure"  # Use the secure entrypoint
-      - "traefik.http.routers.frontend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"  # Specify the internal port if necessary
+      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
-    backend:
-     image: edwardkemp/backend:latest
-     labels:
-       - "traefik.enable=true"
-       - "traefik.http.routers.backend.rule=Host(`edward-codes.com`) && PathPrefix(`/api`)"  # Route based on hostname and path
-       - "traefik.http.routers.backend.entrypoints=websecure"   # Use the secure entrypoint
-       - "traefik.http.routers.backend.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
-       - "traefik.http.services.backend.loadbalancer.server.port=80"  # Specify the internal port if necessary
+  backend:
+    image: edwardkemp/backend:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.edward-codes.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.services.backend.loadbalancer.server.port=80"
 
 volumes:
   letsencrypt:

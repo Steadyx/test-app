@@ -69,10 +69,10 @@ jobs:
             docker stack rm test-app
             sleep 10  # Wait for the removal to complete
 
-            # Check if the network still exists
+            # Remove network only if it exists
             if docker network ls | grep -q "test-app_default"; then
-              echo "Network still exists. Attempting to remove it..."
-              docker network rm test-app_default
+              echo "Network exists, removing it..."
+              docker network rm test-app_default || echo "Network already removed or doesn't exist."
               sleep 5  # Wait for the removal of the network
             fi
 
