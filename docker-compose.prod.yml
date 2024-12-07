@@ -13,14 +13,13 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--log.level=DEBUG"  # Increased log level for troubleshooting
+      # Removed HTTPS and Let's Encrypt configurations
     ports:
-      - "80:80"
-      # Remove port 443 since HTTPS is disabled
-      # - "443:443"
+      - "80:80"  # Only exposing HTTP
+      # Removed HTTPS port
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      # Retain or remove the letsencrypt volume as needed
-      # - "letsencrypt:/letsencrypt"
+      # Removed Let's Encrypt volume since SSL is disabled
     networks:
       - test-app_default
     deploy:
@@ -32,32 +31,22 @@ services:
         parallelism: 1
         delay: 10s
     labels:
-      # Dedicated ACME Challenge Router (Remove if not using Let's Encrypt)
-      # - "traefik.http.routers.traefik-acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-      # - "traefik.http.routers.traefik-acme.entrypoints=web"
-      # - "traefik.http.routers.traefik-acme.priority=1000"
-      # - "traefik.http.routers.traefik-acme.service=acme-challenge"
-      # - "traefik.http.services.acme-challenge.loadbalancer.server.port=0"
-      
-      # Optional: Restrict access to Traefik dashboard (if needed)
-      # Example Middleware for Basic Auth (optional)
-      # - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
-      
+      # Removed ACME Challenge Router Labels since Let's Encrypt is disabled
+      # Optional: Traefik Dashboard Router (if needed)
+      # - "traefik.http.routers.api-dashboard.rule=Host(`traefik.edward-codes.com`)"
+      # - "traefik.http.routers.api-dashboard.service=api@internal"
+      # - "traefik.http.routers.api-dashboard.entrypoints=web"
+      # - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"  # If using auth
+
   frontend:
     image: edwardkemp/frontend:latest
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
       - "traefik.http.routers.frontend.entrypoints=web"
-      # Remove HTTPS and certificate resolver labels
-      # - "traefik.http.routers.frontend.entrypoints=websecure"
-      # - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      # Removed HTTPS and certificate resolver labels
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
-      # Redirect HTTP to HTTPS except for ACME challenges (remove since HTTPS is disabled)
-      # - "traefik.http.routers.frontend-http.rule=Host(`edward-codes.com`) && !PathPrefix(`/.well-known/acme-challenge`)"
-      # - "traefik.http.routers.frontend-http.entrypoints=web"
-      # - "traefik.http.routers.frontend-http.middlewares=redirect-to-https"
-      # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      # Removed HTTP to HTTPS redirection labels
     networks:
       - test-app_default
     deploy:
@@ -71,10 +60,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`edward-codes.com`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=web"
-      # Remove HTTPS and certificate resolver labels
-      # - "traefik.http.routers.backend.entrypoints=websecure"
-      # - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=3000"
+      # Removed HTTPS and certificate resolver labels
     networks:
       - test-app_default
     deploy:
@@ -82,7 +69,7 @@ services:
       restart_policy:
         condition: on-failure
 
-# Optional: Retain the letsencrypt volume for future use
+# Removed the Let's Encrypt volume since SSL is disabled
 # volumes:
 #   letsencrypt:
 #     driver: local
