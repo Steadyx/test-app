@@ -1,13 +1,10 @@
-FROM node:18-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+# Copy the Nginx configuration
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
-COPY package*.json ./
+# Copy the index.html file to the web root
+COPY index.html /usr/share/nginx/html/
 
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npm", "start"]
+# Expose the default Nginx port
+EXPOSE 80
