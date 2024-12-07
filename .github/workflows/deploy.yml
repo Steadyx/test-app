@@ -42,11 +42,13 @@ jobs:
           chmod 600 ~/.ssh/id_temp
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_temp
+          ls -lah ~/.ssh  # Verify the key exists and is accessible
 
       - name: Add Host Key to Known Hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+          ls -lah ~/.ssh/known_hosts  # Verify known_hosts was updated
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
@@ -55,18 +57,24 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            # Ensure GIT_SSH_COMMAND uses the correct key
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_temp -o StrictHostKeyChecking=no"
+            echo $GIT_SSH_COMMAND
+
             if [ ! -d "/home/edwardkemp/websites/test-app" ]; then
               echo "Project directory does not exist. Cloning repository..."
-              export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_temp"
               git clone git@github.com:Steadyx/test-app.git /home/edwardkemp/websites/test-app
             else
               echo "Project directory exists. Pulling latest changes..."
               cd /home/edwardkemp/websites/test-app
-              export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_temp"
               git pull origin main
             fi
 
             cd /home/edwardkemp/websites/test-app
+            if [ ! -f docker-compose.prod.yml ]; then
+              echo "docker-compose.prod.yml not found. Exiting."
+              exit 1
+            fi
             docker stack deploy -c docker-compose.prod.yml test-app
 
       - name: Cleanup Temporary SSH Key
