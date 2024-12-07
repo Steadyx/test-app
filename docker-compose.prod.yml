@@ -32,8 +32,7 @@ services:
         condition: on-failure
 
   frontend:
-    build:
-      context: ./frontend
+    image: ${{ secrets.DOCKER_USERNAME }}/frontend:latest  # Use the image from Docker Hub
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
