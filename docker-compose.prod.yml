@@ -5,8 +5,6 @@ networks:
     driver: overlay
 
 services:
-  # Traefik service
-services:
   traefik:
     image: traefik:v2.10
     command:
@@ -17,21 +15,16 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
-      - "--api.insecure=false"
+      - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/acme.json"
+      - "--certificatesresolvers.le.acme.tlsChallenge=true" # Using TLS-ALPN-01 challenge
+      - "--api.insecure=false" # Disable Traefik dashboard
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./acme.json:/acme.json"  # Ensure acme.json is present with correct permissions
-    labels:
-      - "traefik.enable=true"
-      # Optional: Enable Traefik dashboard securely
-      # Uncomment and configure the following labels if you wish to expose the Traefik dashboard
-      # - "traefik.http.routers.traefik.rule=Host(`traefik.edward-codes.com`)"
-      # - "traefik.http.routers.traefik.entrypoints=websecure"
-      # - "traefik.http.routers.traefik.tls.certresolver=le"
-      # - "traefik.http.services.traefik.loadbalancer.server.port=8080"
     networks:
       - test-app_default
     deploy:
@@ -39,7 +32,6 @@ services:
       restart_policy:
         condition: on-failure
 
-  # Frontend service
   frontend:
     image: edwardkemp/frontend:latest
     labels:
@@ -55,7 +47,6 @@ services:
       restart_policy:
         condition: on-failure
 
-  # Backend service
   backend:
     image: edwardkemp/backend:latest
     labels:
@@ -74,8 +65,3 @@ services:
         condition: on-failure
     environment:
       - NODE_ENV=production
-
-# Optional: Define secrets if needed
-# secrets:
-#   traefik_acme:
-#     file: ./acme.json
