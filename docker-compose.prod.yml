@@ -19,7 +19,7 @@ services:
       - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.le.acme.storage=/acme.json"
       - "--certificatesresolvers.le.acme.tlsChallenge=true"
-      - "--api.insecure=true"  # For testing purposes; secure in production
+      - "--api.insecure=false"  # For testing purposes; secure in production
     ports:
       - "80:80"
       - "443:443"
