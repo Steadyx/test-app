@@ -61,7 +61,6 @@ services:
   frontend-main:
     image: edwardkemp/frontend:latest
     labels:
-      - "traefik.enable=true"
       - "traefik.http.routers.frontend-main.rule=Host(`edward-codes.com`)"
       - "traefik.http.routers.frontend-main.entrypoints=websecure"
       - "traefik.http.routers.frontend-main.tls.certresolver=le"
