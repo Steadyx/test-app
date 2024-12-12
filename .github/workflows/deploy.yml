@@ -85,6 +85,21 @@ jobs:
               sleep 5
             done
 
+            recreate_secret() {
+              local secret_name="$1"
+              local secret_value="$2"
+
+              if sudo docker secret ls --format '{{.Name}}' | grep -q "^$secret_name$"; then
+                echo "Removing existing secret: $secret_name"
+                sudo docker secret rm "$secret_name"
+              fi
+
+              echo "Creating secret: $secret_name"
+              echo "$secret_value" | sudo docker secret create "$secret_name" -
+            }
+
+            recreate_secret cf_api_key "${{ secrets.CF_API_KEY }}"
+
             echo "Pruning Docker system to remove unused data..."
             sudo docker system prune -f --volumes
 
