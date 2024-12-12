@@ -31,6 +31,7 @@ services:
       - "--certificatesresolvers.le.acme.storage=/acme.json"
       - "--certificatesresolvers.le.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53" 
       - "--api.insecure=false"
+      - "--log.level=DEBUG"
     ports:
       - target: 80
         published: 80
