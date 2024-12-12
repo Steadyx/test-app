@@ -85,6 +85,18 @@ jobs:
               sleep 5
             done
 
+            echo "Ensuring overlay network exists..."
+            NETWORK_NAME="test-app_test-app_default"
+            if ! sudo docker network ls --filter name="^${NETWORK_NAME}$" --format "{{.Name}}" | grep -q "^${NETWORK_NAME}$"; then
+              echo "Creating overlay network: ${NETWORK_NAME}"
+              sudo docker network create \
+                --driver overlay \
+                --attachable \
+                "${NETWORK_NAME}"
+            else
+              echo "Overlay network ${NETWORK_NAME} already exists."
+            fi
+
             recreate_secret() {
               local secret_name="$1"
               local secret_value="$2"
