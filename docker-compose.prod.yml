@@ -2,8 +2,9 @@ version: '3.8'
 
 networks:
   test-app_default:
+    name: "test-app_default"
     driver: overlay
-    attachable: true 
+    attachable: true
     labels:
       - "com.example.description=Main Traefik network for all services"
 
