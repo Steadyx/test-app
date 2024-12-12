@@ -61,13 +61,14 @@ services:
   frontend-main:
     image: edwardkemp/frontend:latest
     labels:
-      - "traefik.http.routers.frontend-main.rule=Host(`edward-codes.com`)"
-      - "traefik.http.routers.frontend-main.entrypoints=websecure"
-      - "traefik.http.routers.frontend-main.tls.certresolver=le"
-      - "traefik.http.services.frontend-main.loadbalancer.server.port=80"
-      - "traefik.http.routers.frontend-www-main.rule=Host(`www.edward-codes.com`)"
-      - "traefik.http.routers.frontend-www-main.entrypoints=websecure"
-      - "traefik.http.routers.frontend-www-main.tls.certresolver=le"
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=le"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.frontend-www.rule=Host(`www.edward-codes.com`)"
+      - "traefik.http.routers.frontend-www.entrypoints=websecure"
+      - "traefik.http.routers.frontend-www.tls.certresolver=le"
     networks:
       - test-app_default
     deploy:
