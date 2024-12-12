@@ -3,7 +3,7 @@ version: '3.8'
 networks:
   test-app_default:
     driver: overlay
-    attachable: true  # Allows external services to connect
+    attachable: true 
     labels:
       - "com.example.description=Main traefik network for all services"
 
@@ -18,7 +18,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=test-app_default"
-      - "--providers.docker.swarmmode=true"  # Explicitly enable swarm mode
+      - "--providers.docker.swarmmode=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
@@ -52,7 +52,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.role == manager  # Ensure Traefik runs on a manager node
+          - node.role == manager
       restart_policy:
         condition: on-failure
       labels:
