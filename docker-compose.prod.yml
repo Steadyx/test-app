@@ -72,6 +72,7 @@ services:
       - "traefik.http.routers.frontend-www-main.entrypoints=websecure"
       - "traefik.http.routers.frontend-www-main.tls.certresolver=le"
       - "traefik.docker.network=test-app_default"
+      - "traefik.http.services.frontend-main.loadbalancer.swarm=true"
     networks:
       - test-app_default
     deploy:
