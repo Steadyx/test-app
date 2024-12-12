@@ -4,6 +4,10 @@ networks:
   test-app_default:
     driver: overlay
 
+secrets:
+  cf_api_key:
+    external: true
+
 services:
   traefik-main:
     image: traefik:v2.10
@@ -16,13 +20,19 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+      - "--certificatesresolvers.le.acme.dnschallenge=true"
+      - "--certificatesresolvers.le.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.le.acme.storage=/acme.json"
-      - "--certificatesresolvers.le.acme.tlsChallenge=true"
-      - "--api.insecure=false"  # For testing purposes; secure in production
+      - "--certificatesresolvers.le.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53" 
+      - "--api.insecure=false"
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - CF_DNS_API_TOKEN=/run/secrets/cf_api_key
+    secrets:
+      - cf_api_key
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./acme.json:/acme.json"
@@ -49,7 +59,7 @@ services:
       - "traefik.http.routers.frontend-www-main.middlewares=redirect-www-main"
       # Middleware to Redirect WWW to Non-WWW
       - "traefik.http.middlewares.redirect-www-main.redirectregex.regex=^https?://www\\.(.*)"
-      - "traefik.http.middlewares.redirect-www-main.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.redirect-www-main.redirectregex.replacement=https://$$1"
       - "traefik.http.middlewares.redirect-www-main.redirectregex.permanent=true"
     networks:
       - test-app_default
