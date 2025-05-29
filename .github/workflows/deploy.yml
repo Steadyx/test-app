@@ -35,100 +35,70 @@ jobs:
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@v0.1.10  # Ensure using a valid version
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_KEY }}  # SSH private key without passphrase
-          port: 22  # Specify if different
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
           script: |
             set -euo pipefail
             IFS=$'\n\t'
 
-            # Variables
             PROJECT_DIR="/home/edwardkemp/websites/test-app"
             REPO_URL="git@github.com:Steadyx/test-app.git"
             BRANCH="main"
             STACK_NAME="test-app"
             NETWORK_NAME="test-app_default"
 
-            echo "Navigating to project directory..."
+            # Clone or update the repo
             if [ ! -d "$PROJECT_DIR" ]; then
-                echo "Project directory does not exist. Cloning repository..."
-                git clone "$REPO_URL" "$PROJECT_DIR"
+              git clone "$REPO_URL" "$PROJECT_DIR"
             else
-                echo "Project directory exists. Pulling latest changes..."
-                cd "$PROJECT_DIR"
-                echo "Fetching latest changes..."
-                git fetch origin
-                echo "Resetting local changes..."
-                git reset --hard origin/"$BRANCH"
+              cd "$PROJECT_DIR"
+              git fetch origin
+              git reset --hard origin/"$BRANCH"
             fi
 
-            echo "Ensuring acme.json exists with correct permissions..."
+            # Ensure acme.json exists with proper perms
             ACME_FILE="$PROJECT_DIR/acme.json"
-            if [ ! -f "$ACME_FILE" ]; then
-                echo "Creating acme.json file for Let's Encrypt."
-                sudo touch "$ACME_FILE"
-            fi
+            [ -f "$ACME_FILE" ] || sudo touch "$ACME_FILE"
             sudo chmod 600 "$ACME_FILE"
 
-            echo "Pulling latest Docker images..."
+            # Pull the latest frontend image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
-            # Function to remove stack and wait for completion
-            remove_stack() {
-                if sudo docker stack ls | grep -q "^${STACK_NAME} "; then
-                    echo "Removing existing stack..."
-                    sudo docker stack rm "${STACK_NAME}"
-                    
-                    echo "Waiting for stack removal..."
-                    while sudo docker stack ls | grep -q "^${STACK_NAME} "; do
-                        echo "Waiting for stack ${STACK_NAME} to be removed..."
-                        sleep 5
-                    done
-                    
-                    # Additional wait for network cleanup
-                    echo "Waiting for network cleanup..."
-                    sleep 10
-                fi
-            }
+            # Remove existing stack
+            if sudo docker stack ls | grep -q "^${STACK_NAME} "; then
+              echo "Removing existing stack..."
+              sudo docker stack rm "${STACK_NAME}"
+            fi
 
-            # Function to ensure network exists
-            ensure_network() {
-                if ! sudo docker network ls | grep -q " ${NETWORK_NAME} "; then
-                    echo "Creating overlay network: ${NETWORK_NAME}"
-                    sudo docker network create \
-                        --driver overlay \
-                        --attachable \
-                        "${NETWORK_NAME}"
-                else
-                    echo "Network ${NETWORK_NAME} already exists."
-                fi
-            }
+            # Wait for services to go down
+            until ! sudo docker stack ls | grep -q "^${STACK_NAME} "; do
+              echo "Waiting for stack ${STACK_NAME} removal..."
+              sleep 5
+            done
 
-            # Function to manage secrets
-            recreate_secret() {
-                local secret_name="$1"
-                local secret_value="$2"
-                if sudo docker secret ls --format '{{.Name}}' | grep -q "^$secret_name$"; then
-                    echo "Removing existing secret: $secret_name"
-                    sudo docker secret rm "$secret_name"
-                fi
-                echo "Creating secret: $secret_name"
-                echo "$secret_value" | sudo docker secret create "$secret_name" -
-            }
+            # Ensure overlay network exists
+            if ! sudo docker network ls --filter name=^${NETWORK_NAME}$ --format '{{.Name}}' | grep -q "^${NETWORK_NAME}$"; then
+              echo "Creating network ${NETWORK_NAME}..."
+              sudo docker network create --driver overlay --attachable "${NETWORK_NAME}"
+            else
+              echo "Network ${NETWORK_NAME} already present."
+            fi
 
-            # Execute deployment steps
-            remove_stack
-            ensure_network
-            recreate_secret cf_api_key "${{ secrets.CF_API_KEY }}"
+            # Update secret
+            if sudo docker secret ls --format '{{.Name}}' | grep -q "^cf_api_key$"; then
+              sudo docker secret rm cf_api_key
+            fi
+            echo "${{ secrets.CF_API_KEY }}" | sudo docker secret create cf_api_key -
 
-            echo "Pruning Docker system..."
+            # Prune unused data
             sudo docker system prune -f --volumes
 
-            echo "Deploying the updated stack..."
+            # Deploy updated stack
             cd "$PROJECT_DIR"
             sudo docker stack deploy -c docker-compose.prod.yml "${STACK_NAME}"
 
-            echo "Deployment completed successfully."
+            echo "✅ Deployment finished."
