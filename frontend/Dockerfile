@@ -1,10 +1,10 @@
 FROM nginx:alpine
 
-# Copy the Nginx configuration
+# Nginx vhost
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Copy the index.html file to the web root
+# Your site files
 COPY index.html /usr/share/nginx/html/
+COPY resume      /usr/share/nginx/html/resume/
 
-# Expose the default Nginx port
 EXPOSE 80
