@@ -46,59 +46,32 @@ jobs:
             IFS=$'\n\t'
 
             PROJECT_DIR="/home/edwardkemp/websites/test-app"
-            REPO_URL="git@github.com:Steadyx/test-app.git"
-            BRANCH="main"
-            STACK_NAME="test-app"
-            NETWORK_NAME="test-app_default"
+            STACK="test-app"
+            IMAGE="${{ secrets.DOCKER_USERNAME }}/frontend:latest"
 
-            # Clone or update the repo
-            if [ ! -d "$PROJECT_DIR" ]; then
-              git clone "$REPO_URL" "$PROJECT_DIR"
-            else
-              cd "$PROJECT_DIR"
-              git fetch origin
-              git reset --hard origin/"$BRANCH"
-            fi
+            # 1) Pull latest code & frontend image
+            cd "$PROJECT_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+            sudo docker pull "$IMAGE"
 
-            # Ensure acme.json exists with proper perms
-            ACME_FILE="$PROJECT_DIR/acme.json"
-            [ -f "$ACME_FILE" ] || sudo touch "$ACME_FILE"
-            sudo chmod 600 "$ACME_FILE"
-
-            # Pull the latest frontend image
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-
-            # Remove existing stack
-            if sudo docker stack ls | grep -q "^${STACK_NAME} "; then
-              echo "Removing existing stack..."
-              sudo docker stack rm "${STACK_NAME}"
-            fi
-
-            # Wait for services to go down
-            until ! sudo docker stack ls | grep -q "^${STACK_NAME} "; do
-              echo "Waiting for stack ${STACK_NAME} removal..."
-              sleep 5
-            done
-
-            # Ensure overlay network exists
-            if ! sudo docker network ls --filter name=^${NETWORK_NAME}$ --format '{{.Name}}' | grep -q "^${NETWORK_NAME}$"; then
-              echo "Creating network ${NETWORK_NAME}..."
-              sudo docker network create --driver overlay --attachable "${NETWORK_NAME}"
-            else
-              echo "Network ${NETWORK_NAME} already present."
-            fi
-
-            # Update secret
-            if sudo docker secret ls --format '{{.Name}}' | grep -q "^cf_api_key$"; then
+            # 2) Recreate the Cloudflare secret (so Traefik sees it)
+            if sudo docker secret ls --format '{{.Name}}' | grep -q '^cf_api_key$'; then
               sudo docker secret rm cf_api_key
             fi
             echo "${{ secrets.CF_API_KEY }}" | sudo docker secret create cf_api_key -
 
-            # Prune unused data
-            sudo docker system prune -f --volumes
+            # 3) Force-update Traefik to pick up the new secret
+            sudo docker service update \
+              --env-add CLOUDFLARE_DNS_API_TOKEN \
+              --force \
+              "${STACK}_traefik-main"
 
-            # Deploy updated stack
-            cd "$PROJECT_DIR"
-            sudo docker stack deploy -c docker-compose.prod.yml "${STACK_NAME}"
+            # 4) Update frontend service to use the new image
+            sudo docker service update \
+              --image "$IMAGE" \
+              --force \
+              "${STACK}_frontend-main"
 
-            echo "✅ Deployment finished."
+            echo "✅ Services upgraded. Monitor cert issuance with:"
+            echo "   docker service logs ${STACK}_traefik-main --follow --since 2m"

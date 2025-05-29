@@ -42,9 +42,8 @@ services:
         published: 443
         protocol: tcp
         mode: ingress
-    # <-- inject secret value here (no “=…”)
     environment:
-      - CF_DNS_API_TOKEN
+      - CLOUDFLARE_DNS_API_TOKEN
     secrets:
       - cf_api_key
     volumes:
