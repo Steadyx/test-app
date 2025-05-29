@@ -55,23 +55,22 @@ jobs:
             git reset --hard origin/main
             sudo docker pull "$IMAGE"
 
-            # 2) Recreate the Cloudflare secret (so Traefik sees it)
-            if sudo docker secret ls --format '{{.Name}}' | grep -q '^cf_api_key$'; then
-              sudo docker secret rm cf_api_key
+            # 2) Ensure Cloudflare secret exists (don't remove if it's in use)
+            if ! sudo docker secret ls --format '{{.Name}}' | grep -q '^cf_api_key$'; then
+              echo "${{ secrets.CF_API_KEY }}" | sudo docker secret create cf_api_key -
             fi
-            echo "${{ secrets.CF_API_KEY }}" | sudo docker secret create cf_api_key -
 
-            # 3) Force-update Traefik to pick up the new secret
+            # 3) Force-update Traefik to pick up the secret/env var fix
             sudo docker service update \
               --env-add CLOUDFLARE_DNS_API_TOKEN \
               --force \
               "${STACK}_traefik-main"
 
-            # 4) Update frontend service to use the new image
+            # 4) Update frontend to the new image
             sudo docker service update \
               --image "$IMAGE" \
               --force \
               "${STACK}_frontend-main"
 
-            echo "✅ Services upgraded. Monitor cert issuance with:"
+            echo "✅ Services upgraded. Watch Traefik cert logs with:"
             echo "   docker service logs ${STACK}_traefik-main --follow --since 2m"
