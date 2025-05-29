@@ -2,7 +2,7 @@ version: '3.8'
 
 networks:
   test-app_default:
-    name: "test-app_default"
+    name: test-app_default
     driver: overlay
     attachable: true
     labels:
@@ -29,7 +29,8 @@ services:
       - "--certificatesresolvers.le.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.le.acme.email=edwardlanekemp@gmail.com"
       - "--certificatesresolvers.le.acme.storage=/acme.json"
-      - "--certificatesresolvers.le.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53" 
+      - "--certificatesresolvers.le.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53"
+      - "--certificatesresolvers.le.acme.dnschallenge.delayBeforeCheck=0"
       - "--api.insecure=false"
       - "--log.level=DEBUG"
     ports:
@@ -41,8 +42,9 @@ services:
         published: 443
         protocol: tcp
         mode: ingress
+    # <-- inject secret value here (no “=…”)
     environment:
-      - CF_DNS_API_TOKEN=/run/secrets/cf_api_key
+      - CF_DNS_API_TOKEN
     secrets:
       - cf_api_key
     volumes:
@@ -70,21 +72,16 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-
-        # Router for Non-WWW Domain
+        # Non-WWW router
         - "traefik.http.routers.frontend.rule=Host(`edward-codes.com`)"
         - "traefik.http.routers.frontend.entrypoints=websecure"
         - "traefik.http.routers.frontend.tls.certresolver=le"
         - "traefik.http.services.frontend.loadbalancer.server.port=80"
-
-        # Router for WWW Domain with Redirect Middleware
+        # WWW → Non-WWW redirect
         - "traefik.http.routers.frontend-www.rule=Host(`www.edward-codes.com`)"
         - "traefik.http.routers.frontend-www.entrypoints=websecure"
         - "traefik.http.routers.frontend-www.tls.certresolver=le"
         - "traefik.http.routers.frontend-www.middlewares=redirect-www"
-
-        # Middleware to Redirect WWW to Non-WWW
         - "traefik.http.middlewares.redirect-www.redirectregex.regex=^https?://www\\.(.*)"
         - "traefik.http.middlewares.redirect-www.redirectregex.replacement=https://$${1}"
         - "traefik.http.middlewares.redirect-www.redirectregex.permanent=true"
-
