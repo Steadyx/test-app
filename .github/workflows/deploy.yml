@@ -1,39 +1,31 @@
 name: Deploy to VPS
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Build and push frontend image
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-
       - name: Add Host Key to Known Hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -54,9 +46,10 @@ jobs:
             git reset --hard origin/main
             sudo docker pull "$IMAGE"
             
-            # Initialize swarm if not already done
+            # Check if we're a swarm manager, if not fix it
             if ! sudo docker node ls >/dev/null 2>&1; then
-              echo "Initializing Docker Swarm..."
+              echo "Node is not a swarm manager, fixing..."
+              sudo docker swarm leave --force 2>/dev/null || true
               sudo docker swarm init
             fi
             
@@ -65,7 +58,8 @@ jobs:
               echo "${{ secrets.CF_API_KEY }}" | sudo docker secret create cf_api_key -
             fi
             
-            # Deploy or update the entire stack
+            # Deploy the entire stack
             sudo docker stack deploy -c docker-compose.prod.yml "$STACK"
             
             echo "✅ Stack deployed successfully!"
+            echo "Check services with: sudo docker service ls"
