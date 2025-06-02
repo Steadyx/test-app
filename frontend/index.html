@@ -6,532 +6,91 @@
   <title>Edward Kemp – Full Stack Engineer</title>
   <meta name="description" content="Edward Kemp – Experienced Full Stack Engineer specializing in scalable applications, Node.js, React, and modern web technologies."/>
 
-  <!-- Enable class-based dark mode before loading Tailwind -->
+  <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+  <link rel="manifest" href="/favicon/site.webmanifest" />
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script>
     tailwind.config = { darkMode: 'class' };
   </script>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6); }
-        }
-        
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        .animate-fadeInUp {
-            animation: fadeInUp 0.8s ease-out;
-        }
-        .animate-pulse-slow {
-            animation: pulse 3s ease-in-out infinite;
-        }
-        .animate-glow {
-            animation: glow 2s ease-in-out infinite;
-        }
-        
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .glass-dark {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .skill-tag {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .skill-tag:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-        
-        .dark .skill-tag {
-            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
-        }
-        
-        /* Dark mode styles */
-        .dark {
-            color-scheme: dark;
-        }
-    </style>
-
-
-  <script>
-    (function(){
-      const t = localStorage.theme;
-      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      }
-    })();
-    function toggleTheme() {
-      const html = document.documentElement;
-      if (html.classList.toggle('dark')) localStorage.theme = 'dark';
-      else localStorage.theme = 'light';
-    }
-  </script>
-</head>
-<body class="font-sans antialiased text-slate-900 bg-white dark:text-white dark:bg-slate-900 transition-colors duration-300">
-    <!-- Skip Link for Accessibility -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-violet-600 text-white px-3 py-2 rounded-md z-50">
-        Skip to main content
-    </a>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 z-40 transition-colors duration-300" role="navigation" aria-label="Main navigation">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="#home" class="text-xl font-bold gradient-text hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 rounded-md px-2 py-1">
-                    Edward Kemp
-                </a>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#about" class="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 rounded-md px-3 py-2">About</a>
-                    <a href="#skills" class="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 rounded-md px-3 py-2">Skills</a>
-                    <a href="#experience" class="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 rounded-md px-3 py-2">Experience</a>
-                    <a href="#contact" class="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 rounded-md px-3 py-2">Contact</a>
-                    
-                    <!-- Theme Toggle Button -->
-                    <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2" aria-label="Toggle theme">
-                        <svg class="w-5 h-5 dark:hidden" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
-                        </svg>
-                        <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900 dark:from-slate-900 dark:via-violet-900 dark:to-indigo-900 text-white relative overflow-hidden">
-        <!-- Animated Background Elements -->
-        <div class="absolute inset-0 opacity-30">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-violet-500 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
-            <div class="absolute top-40 right-10 w-96 h-96 bg-cyan-400 rounded-full mix-blend-multiply filter blur-xl animate-float" style="animation-delay: 2s;"></div>
-            <div class="absolute bottom-20 left-20 w-80 h-80 bg-emerald-400 rounded-full mix-blend-multiply filter blur-xl animate-float" style="animation-delay: 4s;"></div>
-        </div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-4xl animate-fadeInUp">
-                <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                    Edward Kemp
-                </h1>
-                <p class="text-xl sm:text-2xl lg:text-3xl gradient-text font-semibold mb-6">
-                    Full Stack Engineer
-                </p>
-                <p class="text-lg sm:text-xl text-white/90 max-w-3xl mb-10 leading-relaxed">
-                    Experienced full stack engineer specializing in scalable applications and optimizing system performance. 
-                    Proficient in Node.js, microservices architecture, and RESTful API integration with a strong focus on 
-                    collaboration and mentorship.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="#experience" 
-                       class="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-purple-900 min-h-[44px]">
-                        <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14,2 14,8 20,8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
-                        View My Work
-                    </a>
-                    <a href="./resume/Edward_Kemp_Resume.pdf" 
-                       download
-                       class="group inline-flex items-center justify-center px-8 py-4 glass hover:bg-white/20 text-white font-semibold rounded-xl border-2 border-white/30 hover:border-white/50 transition-all duration-300 hover:transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-900 min-h-[44px]"
-                       aria-label="Download Edward Kemp's resume as PDF">
-                        <svg class="w-5 h-5 mr-2 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7,10 12,15 17,10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Download Resume
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-            </svg>
-        </div>
-    </section>
-
-    <main id="main-content">
-        <!-- About Section -->
-        <section id="about" class="py-20 bg-white dark:bg-slate-900 transition-colors duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-4xl mx-auto">
-                    <h2 class="text-4xl sm:text-5xl font-bold gradient-text mb-6">About Me</h2>
-                    <p class="text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
-                        Passionate about creating innovative solutions and mentoring the next generation of developers. 
-                        Currently working with cutting-edge technologies at creative agencies and tech companies across London, 
-                        with a proven track record of delivering scalable applications and optimizing system performance.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills Section -->
-        <section id="skills" class="py-20 bg-slate-50 dark:bg-slate-800/50 transition-colors duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl sm:text-5xl font-bold gradient-text mb-6">Technical Expertise</h2>
-                    <p class="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
-                        Comprehensive skill set spanning modern frontend frameworks, robust backend technologies, 
-                        and cloud infrastructure solutions.
-                    </p>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:transform hover:-translate-y-4 border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center mb-6">
-                                <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Frontend Development</h3>
-                            </div>
-                            <div class="flex flex-wrap gap-3">
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">React</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">TypeScript</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Vue.js</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Angular</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">JavaScript</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">HTML/CSS</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:transform hover:-translate-y-4 border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center mb-6">
-                                <div class="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M4 7v10c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V7c0-2.21-1.79-4-4-4H8c-2.21 0-4 1.79-4 4z"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Backend & Database</h3>
-                            </div>
-                            <div class="flex flex-wrap gap-3">
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Node.js</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Python</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Ruby on Rails</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">PostgreSQL</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">MongoDB</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">MySQL</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:transform hover:-translate-y-4 border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center mb-6">
-                                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Architecture & DevOps</h3>
-                            </div>
-                            <div class="flex flex-wrap gap-3">
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Microservices</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">RESTful APIs</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Docker</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">AWS</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Azure</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">CI/CD</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:transform hover:-translate-y-4 border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center mb-6">
-                                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mr-4 group-hover:rotate-12 transition-transform duration-300">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M12 2l2.09 6.26L20 9.27l-5 4.87 1.18 6.88L12 17.77l-4.18 2.25L9 14.14 4 9.27l5.91-1.01L12 2z"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Methodologies</h3>
-                            </div>
-                            <div class="flex flex-wrap gap-3">
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Agile</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Testing</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Mentorship</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Problem Solving</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Collaboration</span>
-                                <span class="skill-tag px-4 py-2 text-white text-sm font-medium rounded-full shadow-lg">Code Review</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Experience Section -->
-        <section id="experience" class="py-20 bg-white dark:bg-slate-900 transition-colors duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl sm:text-5xl font-bold gradient-text mb-6">Professional Experience</h2>
-                    <p class="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
-                        A track record of delivering scalable solutions and leading technical initiatives 
-                        across diverse industries and project types.
-                    </p>
-                </div>
-
-                <div class="max-w-4xl mx-auto space-y-8">
-                    <article class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl border border-slate-200 dark:border-slate-700 transition-all duration-500 hover:transform hover:-translate-y-2 relative overflow-hidden">
-                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-violet-500 to-purple-600 rounded-l-3xl"></div>
-                        <div class="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="ml-6 relative z-10">
-                            <div class="mb-4">
-                                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Full Stack Engineer</h3>
-                                <p class="text-lg font-semibold text-violet-600 dark:text-violet-400 mb-1">Kijo, Birmingham</p>
-                                <p class="text-slate-500 dark:text-slate-400 font-medium">February 2025 - May 2025</p>
-                            </div>
-                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                Led technology selection and delivered cutting-edge digital solutions for a creative WordPress-focused design agency. 
-                                Built interactive websites using React, Node.js, PHP, and Docker while mentoring junior developers and 
-                                optimizing backend microservices with PostgreSQL integration.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl border border-slate-200 dark:border-slate-700 transition-all duration-500 hover:transform hover:-translate-y-2 relative overflow-hidden">
-                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-l-3xl"></div>
-                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="ml-6 relative z-10">
-                            <div class="mb-4">
-                                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Full Stack Engineer</h3>
-                                <p class="text-lg font-semibold text-cyan-600 dark:text-cyan-400 mb-1">Quinyx, London</p>
-                                <p class="text-slate-500 dark:text-slate-400 font-medium">July 2023 - August 2024</p>
-                            </div>
-                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                Designed and delivered scalable full-stack solutions with focus on performance optimization. 
-                                Developed robust frontend features using React and TypeScript, backend microservices with Node.js and PostgreSQL. 
-                                Enhanced CI/CD pipelines, reducing deployment times by 30% and mentoring junior engineers.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl border border-slate-200 dark:border-slate-700 transition-all duration-500 hover:transform hover:-translate-y-2 relative overflow-hidden">
-                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-emerald-500 to-green-600 rounded-l-3xl"></div>
-                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="ml-6 relative z-10">
-                            <div class="mb-4">
-                                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Full Stack Developer</h3>
-                                <p class="text-lg font-semibold text-emerald-600 dark:text-emerald-400 mb-1">Viooh, London</p>
-                                <p class="text-slate-500 dark:text-slate-400 font-medium">October 2022 - July 2023</p>
-                            </div>
-                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                Built modular frontend components with React, Vue.js, and TypeScript, improving code reuse and maintainability. 
-                                Developed backend features using Python and Node.js, optimized application performance reducing load times by 25%, 
-                                and maintained robust testing practices for software reliability.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="group bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl border border-slate-200 dark:border-slate-700 transition-all duration-500 hover:transform hover:-translate-y-2 relative overflow-hidden">
-                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-amber-500 to-orange-600 rounded-l-3xl"></div>
-                        <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="ml-6 relative z-10">
-                            <div class="mb-4">
-                                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Software Engineer</h3>
-                                <p class="text-lg font-semibold text-amber-600 dark:text-amber-400 mb-1">Squiz, London</p>
-                                <p class="text-slate-500 dark:text-slate-400 font-medium">June 2021 - September 2022</p>
-                            </div>
-                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                Delivered high-quality applications for both greenfield and legacy projects. Developed dynamic web interfaces 
-                                using Angular and React, refactored legacy systems to modern frameworks reducing technical debt, and collaborated 
-                                with infrastructure teams for secure AWS deployments.
-                            </p>
-                        </div>
-                    </article>
-                </div>
-
-                <div class="text-center mt-16">
-                    <a href="./resume/Edward_Kemp_Resume.pdf" 
-                       download
-                       class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 min-h-[44px]">
-                        <svg class="w-5 h-5 mr-2 group-hover:animate-pulse" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14,2 14,8 20,8"></polyline>
-                        </svg>
-                        View Full Resume
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="py-20 bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900 dark:from-slate-900 dark:via-violet-900 dark:to-indigo-900 text-white relative overflow-hidden">
-            <!-- Background Effects -->
-            <div class="absolute inset-0 opacity-20">
-                <div class="absolute top-20 left-10 w-96 h-96 bg-violet-400 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-                <div class="absolute bottom-20 right-10 w-80 h-80 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl animate-float" style="animation-delay: 3s;"></div>
-            </div>
-            
-            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl sm:text-5xl font-bold mb-6">Let's Work Together</h2>
-                    <p class="text-xl text-white/80 max-w-3xl mx-auto">
-                        Ready to collaborate on your next project? I'd love to discuss how we can bring your vision to life 
-                        with modern, scalable solutions.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                    <div class="group text-center p-8 glass hover:bg-white/20 rounded-3xl border border-white/20 hover:border-white/40 transition-all duration-500 hover:transform hover:-translate-y-4">
-                        <div class="w-20 h-20 bg-gradient-to-br from-violet-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
-                            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-3">Phone</h3>
-                        <p class="text-white/80">
-                            <a href="tel:07727585787" class="hover:text-violet-300 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-purple-900 rounded-md px-2 py-1">
-                                07727585787
-                            </a>
-                        </p>
-                    </div>
-
-                    <div class="group text-center p-8 glass hover:bg-white/20 rounded-3xl border border-white/20 hover:border-white/40 transition-all duration-500 hover:transform hover:-translate-y-4">
-                        <div class="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
-                            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-3">Email</h3>
-                        <p class="text-white/80">
-                            <a href="mailto:edwardlanekemp@gmail.com" class="hover:text-cyan-300 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-purple-900 rounded-md px-2 py-1">
-                                edwardlanekemp@gmail.com
-                            </a>
-                        </p>
-                    </div>
-
-                    <div class="group text-center p-8 glass hover:bg-white/20 rounded-3xl border border-white/20 hover:border-white/40 transition-all duration-500 hover:transform hover:-translate-y-4">
-                        <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
-                            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-3">Location</h3>
-                        <p class="text-white/80">London, UK</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-slate-900 dark:bg-slate-950 text-white/60 py-12 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="text-center md:text-left">
-                    <p class="text-lg font-semibold gradient-text mb-2">Edward Kemp</p>
-                    <p>&copy; 2025 Edward Kemp. All rights reserved.</p>
-                </div>
-                <div class="flex space-x-6">
-                    <a href="./resume/Edward_Kemp_Resume.pdf" 
-                       download
-                       class="text-white/60 hover:text-violet-400 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-md px-2 py-1">
-                        Resume
-                    </a>
-                    <a href="#contact" 
-                       class="text-white/60 hover:text-violet-400 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-md px-2 py-1">
-                        Contact
-                    </a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-
-  <!-- Combined scroll, parallax, fade-in -->
-  <script>
-    const offset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-offset'));
-
-    document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener('click',e=>{
-        e.preventDefault();
-        const tgt=document.querySelector(a.getAttribute('href'));
-        if(!tgt)return;
-        const top=tgt.getBoundingClientRect().top + window.pageYOffset - offset;
-        window.scrollTo({ top, behavior:'smooth' });
-      });
-    });
-
-    const observer = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          e.target.style.opacity=1;
-          e.target.style.transform='translateY(0)';
-        }
-      });
-    },{ threshold:0.1, rootMargin:'0px 0px -50px 0px' });
-
-    document.addEventListener('DOMContentLoaded',()=>{
-      document.querySelectorAll('.group').forEach((el,i)=>{
-        el.style.opacity=0;
-        el.style.transform='translateY(30px)';
-        el.style.transition=`opacity .6s ease ${i*0.1}s, transform .6s ease ${i*0.1}s`;
-        observer.observe(el);
-      });
-    });
-
-    window.addEventListener('scroll',()=>{
-      const y=window.scrollY, nav=document.querySelector('nav');
-      if(y>100){
-        nav.classList.replace('bg-white/95','bg-white/100');
-        nav.classList.replace('dark:bg-slate-900/95','dark:bg-slate-900/100');
-        nav.classList.add('shadow-xl');
-      } else {
-        nav.classList.replace('bg-white/100','bg-white/95');
-        nav.classList.replace('dark:bg-slate-900/100','dark:bg-slate-900/95');
-        nav.classList.remove('shadow-xl');
-      }
-      const rate=y*-0.5;
-      document.querySelectorAll('.animate-float').forEach(el=>el.style.transform=`translateY(${rate}px)`);
-    });
-  </script>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+      50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6); }
+    }
+    
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    .animate-fadeInUp {
+      animation: fadeInUp 0.8s ease-out;
+    }
+    .animate-pulse-slow {
+      animation: pulse 3s ease-in-out infinite;
+    }
+    .animate-glow {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .glass-dark {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .skill-tag {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .skill-tag:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .dark .skill-tag {
+      background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+    }
+    
+    .dark {
+      color-scheme: dark;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

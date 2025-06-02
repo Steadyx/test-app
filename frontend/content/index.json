@@ -1,0 +1,88 @@
+{
+  "nav": [
+    { "id": "home", "label": "Home" },
+    { "id": "about", "label": "About" },
+    { "id": "skills", "label": "Skills" },
+    { "id": "experience", "label": "Experience" },
+    { "id": "contact", "label": "Contact" }
+  ],
+  "sections": {
+    "home": {
+      "title": "Edward Kemp",
+      "subtitle": "Full Stack Engineer",
+      "description": "Experienced full stack engineer specializing in scalable applications and optimizing system performance. Proficient in Node.js, microservices architecture, and RESTful API integration with a strong focus on collaboration and mentorship.",
+      "cta": [
+        { "label": "View My Work", "target": "experience" },
+        { "label": "Download Resume", "href": "./resume/Edward_Kemp_Resume.pdf", "download": true }
+      ]
+    },
+    "about": {
+      "heading": "About Me",
+      "text": "Passionate about creating innovative solutions and mentoring the next generation of developers. Currently working with cutting-edge technologies at creative agencies and tech companies across London, with a proven track record of delivering scalable applications and optimizing system performance."
+    },
+    "skills": {
+      "heading": "Technical Expertise",
+      "description": "Comprehensive skill set spanning modern frontend frameworks, robust backend technologies, and cloud infrastructure solutions.",
+      "categories": [
+        {
+          "title": "Frontend Development",
+          "tags": ["React", "TypeScript", "Vue.js", "Angular", "JavaScript", "HTML/CSS"]
+        },
+        {
+          "title": "Backend & Database",
+          "tags": ["Node.js", "Python", "Ruby on Rails", "PostgreSQL", "MongoDB", "MySQL"]
+        },
+        {
+          "title": "Architecture & DevOps",
+          "tags": ["Microservices", "RESTful APIs", "Docker", "AWS", "Azure", "CI/CD"]
+        },
+        {
+          "title": "Methodologies",
+          "tags": ["Agile", "Testing", "Mentorship", "Problem Solving", "Collaboration", "Code Review"]
+        }
+      ]
+    },
+    "experience": {
+      "heading": "Professional Experience",
+      "entries": [
+        {
+          "role": "Full Stack Engineer",
+          "company": "Kijo",
+          "location": "Birmingham",
+          "period": "February 2025 - May 2025",
+          "description": "Led technology selection and delivered cutting-edge digital solutions for a creative WordPress-focused design agency. Built interactive websites using React, Node.js, PHP, and Docker while mentoring junior developers and optimizing backend microservices with PostgreSQL integration."
+        },
+        {
+          "role": "Full Stack Engineer",
+          "company": "Quinyx",
+          "location": "London",
+          "period": "July 2023 - August 2024",
+          "description": "Designed and delivered scalable full-stack solutions with focus on performance optimization. Developed robust frontend features using React and TypeScript, backend microservices with Node.js and PostgreSQL. Enhanced CI/CD pipelines, reducing deployment times by 30% and mentoring junior engineers."
+        },
+        {
+          "role": "Full Stack Developer",
+          "company": "Viooh",
+          "location": "London",
+          "period": "October 2022 - July 2023",
+          "description": "Built modular frontend components with React, Vue.js, and TypeScript, improving code reuse and maintainability. Developed backend features using Python and Node.js, optimized application performance reducing load times by 25%, and maintained robust testing practices for software reliability."
+        },
+        {
+          "role": "Software Engineer",
+          "company": "Squiz",
+          "location": "London",
+          "period": "June 2021 - September 2022",
+          "description": "Delivered high-quality applications for both greenfield and legacy projects. Developed dynamic web interfaces using Angular and React, refactored legacy systems to modern frameworks reducing technical debt, and collaborated with infrastructure teams for secure AWS deployments."
+        }
+      ]
+    },
+    "contact": {
+      "heading": "Let's Work Together",
+      "text": "Ready to collaborate on your next project? I'd love to discuss how we can bring your vision to life with modern, scalable solutions.",
+      "items": [
+        { "type": "Phone", "value": "07727585787" },
+        { "type": "Email", "value": "edwardlanekemp@gmail.com" },
+        { "type": "Location", "value": "London, UK" }
+      ]
+    }
+  }
+}
