@@ -44,33 +44,28 @@ jobs:
           script: |
             set -euo pipefail
             IFS=$'\n\t'
-
             PROJECT_DIR="/home/edwardkemp/websites/test-app"
             STACK="test-app"
             IMAGE="${{ secrets.DOCKER_USERNAME }}/frontend:latest"
-
-            # 1) Pull latest code & frontend image
+            
+            # Pull latest code & frontend image
             cd "$PROJECT_DIR"
             git fetch origin main
             git reset --hard origin/main
             sudo docker pull "$IMAGE"
-
-            # 2) Ensure Cloudflare secret exists (don't remove if it's in use)
+            
+            # Initialize swarm if not already done
+            if ! sudo docker node ls >/dev/null 2>&1; then
+              echo "Initializing Docker Swarm..."
+              sudo docker swarm init
+            fi
+            
+            # Ensure Cloudflare secret exists
             if ! sudo docker secret ls --format '{{.Name}}' | grep -q '^cf_api_key$'; then
               echo "${{ secrets.CF_API_KEY }}" | sudo docker secret create cf_api_key -
             fi
-
-            # 3) Force-update Traefik to pick up the secret/env var fix
-            sudo docker service update \
-              --env-add CLOUDFLARE_DNS_API_TOKEN \
-              --force \
-              "${STACK}_traefik-main"
-
-            # 4) Update frontend to the new image
-            sudo docker service update \
-              --image "$IMAGE" \
-              --force \
-              "${STACK}_frontend-main"
-
-            echo "✅ Services upgraded. Watch Traefik cert logs with:"
-            echo "   docker service logs ${STACK}_traefik-main --follow --since 2m"
+            
+            # Deploy or update the entire stack
+            sudo docker stack deploy -c docker-compose.prod.yml "$STACK"
+            
+            echo "✅ Stack deployed successfully!"
